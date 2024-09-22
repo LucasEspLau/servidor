@@ -1,6 +1,6 @@
 // products.mjs
 import { pool } from "../conexion.mjs";
-import { uploadImageAndGetUrl } from "../service/imgStorage.mjs";
+//import { uploadImageAndGetUrl } from "../service/imgStorage.mjs";
 
 /**
  * Obtener todos los productos
@@ -17,6 +17,84 @@ export const getAllProducts = async (callback) => {
         callback(err, null);
     }
 };
+
+export const updateProduct = async (productId, productData, callback) => {
+    const { nombre, descripcion, img, precio, stock } = productData; // Ahora también destructuramos stock
+
+    if (!nombre || !precio || stock == null) {
+        return callback({ message: 'Nombre, precio y stock son requeridos' }, null);
+    }
+
+    // La consulta SQL para actualizar el producto incluyendo stock
+    const query = `
+        UPDATE productos
+        SET nombre = $1, descripcion = $2, img = $3, precio = $4, stock = $5
+        WHERE id = $6
+        RETURNING *;
+    `;
+
+    const values = [nombre, descripcion || null, img || null, precio, stock, productId];
+
+    try {
+        const res = await pool.query(query, values); // Ejecutamos la consulta
+        const updatedProduct = res.rows[0]; // Obtenemos el producto actualizado
+        callback(null, updatedProduct); // Devolvemos el producto actualizado
+    } catch (err) {
+        console.error('Error al actualizar el producto:', err);
+        callback(err, null); // En caso de error, lo devolvemos al controlador
+    }
+};
+
+
+
+// Crear un producto nuevo
+export const createProduct = async (productData, callback) => {
+    const { nombre, descripcion, img, precio, stock } = productData; // Destructuramos stock e img directamente
+
+    if (!nombre || !precio || stock == null) {
+        return callback({ message: 'Nombre, precio y stock son requeridos' }, null);
+    }
+
+    // Consulta SQL para insertar un nuevo producto, incluyendo el campo stock y la URL de la imagen
+    const query = `
+        INSERT INTO productos (nombre, descripcion, img, precio, stock)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *;
+    `;
+
+    // Usamos directamente la URL que viene en el campo img
+    const values = [nombre, descripcion || null, img || null, precio, stock];
+
+    try {
+        const res = await pool.query(query, values); // Ejecutamos la consulta
+        const newProduct = res.rows[0]; // Obtenemos el producto recién creado
+        callback(null, newProduct); // Devolvemos el producto creado
+    } catch (err) {
+        console.error('Error al crear el producto:', err);
+        callback(err, null); // En caso de error, lo devolvemos al controlador
+    }
+};
+
+
+export const deleteProduct = async (productId, callback) => {
+    // La consulta SQL para eliminar el producto
+    const query = `
+        DELETE FROM productos
+        WHERE id = $1
+        RETURNING *;
+    `;
+
+    try {
+        const res = await pool.query(query, [productId]); // Ejecutamos la consulta
+        const deletedProduct = res.rows[0]; // Obtenemos el producto eliminado
+        callback(null, deletedProduct); // Devolvemos el producto eliminado
+    } catch (err) {
+        console.error('Error al eliminar el producto:', err);
+        callback(err, null); // En caso de error, lo devolvemos al controlador
+    }
+};
+
+
 
 /**
  * Actualizar un producto

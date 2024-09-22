@@ -1,5 +1,5 @@
 import * as ProductModel from '../models/product.mjs';
-import { uploadImageAndGetUrl } from '../service/imgStorage.mjs';
+//import { uploadImageAndGetUrl } from '../service/imgStorage.mjs';
 
 export const getAllProducts = (req, res) => {
     ProductModel.getAllProducts((err, products) => {
@@ -13,6 +13,52 @@ export const getAllProducts = (req, res) => {
     });
 };
 
+export const updateProduct = (req, res) => {
+    const productId = req.params.id; // El ID del producto a actualizar
+    const productData = req.body; // Los datos del producto a actualizar desde el cuerpo de la solicitud
+
+    // Llamamos al modelo para actualizar el producto
+    ProductModel.updateProduct(productId, productData, (err, updatedProduct) => {
+        if (err) {
+            console.error('Error updating product:', err);
+            return res.status(500).json({ message: 'Error updating product' });
+        }
+        res.status(200).json(updatedProduct); // Devolvemos el producto actualizado
+    });
+};
+
+// Crear un producto nuevo
+export const createProduct = (req, res) => {
+    const productData = req.body; // Datos del producto desde el cuerpo de la solicitud
+
+    // Llamamos al modelo para crear el producto
+    ProductModel.createProduct(productData, (err, newProduct) => {
+        if (err) {
+            console.error('Error creating product:', err);
+            return res.status(500).json({ message: 'Error creating product' });
+        }
+        res.status(201).json(newProduct); // Devolvemos el producto creado
+    });
+};
+
+export const deleteProduct = (req, res) => {
+    const productId = req.params.id; // El ID del producto a eliminar
+
+    // Llamamos al modelo para eliminar el producto
+    ProductModel.deleteProduct(productId, (err, deletedProduct) => {
+        if (err) {
+            console.error('Error deleting product:', err);
+            return res.status(500).json({ message: 'Error deleting product' });
+        }
+        if (!deletedProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.status(200).json({ message: 'Product deleted successfully', deletedProduct }); // Devolvemos un mensaje de éxito
+    });
+};
+
+
+/*
 export const updateProduct = async (req, res) => {
     const productId = req.params.id; // El ID del producto a actualizar
     const productData = req.body; // Los datos del producto a actualizar desde el cuerpo de la solicitud
@@ -68,4 +114,4 @@ export const createProduct = async (req, res) => {
         console.error('Error processing image upload:', error);
         return res.status(500).json({ message: 'Error processing image upload' });
     }
-};
+};*/

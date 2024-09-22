@@ -7,6 +7,8 @@ const router = express.Router();
 
 
 router.get('/products', productController.getAllProducts)
-router.put('/products/:id',upload.single('image'),productController.updateProduct)
-router.post('/product-create',upload.single('image'), productController.createProduct)
+router.put('/products/:id',productController.updateProduct)
+router.post('/product-create',productController.createProduct)
+router.delete('/products/:id', productController.deleteProduct);
+
 export default router;
