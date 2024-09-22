@@ -18,7 +18,7 @@ app.use(express.json());
 const io = new SocketIOServer(httpServer, {
     cors: {
         origin: '*', // Permite todos los orígenes
-        methods: ['GET', 'POST', 'PUT']
+        methods: ['GET', 'POST', 'PUT', 'DELETE']
     }
 });
 
