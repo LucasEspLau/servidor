@@ -10,7 +10,7 @@ const httpServer = createServer(app);
 // Configura CORS para permitir solicitudes desde cualquier origen
 app.use(cors({
     origin: '*', // Permite todos los orígenes
-    methods: ['GET', 'POST', 'PUT']
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
 app.use(express.json());
